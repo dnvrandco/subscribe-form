@@ -33,34 +33,41 @@
 
         .form-wrapper {
             display: flex;
+            flex-direction: column;
             gap: 1rem;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
+            align-items: stretch;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
+        .name-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        input[type="text"],
         input[type="email"] {
             padding: 1.2rem 1.5rem;
             font-size: 1.1rem;
-            border: 2px solid #ff6f61;
+            border: 2px solid #7a9e7e;
             border-radius: 8px;
             background: #f2e7da;
             color: #333333;
             font-family: 'Anybody', sans-serif;
             transition: all 0.3s ease;
             flex: 1;
-            min-width: 300px;
-            max-width: 500px;
         }
 
+        input[type="text"]::placeholder,
         input[type="email"]::placeholder {
             color: #999999;
         }
 
+        input[type="text"]:focus,
         input[type="email"]:focus {
             outline: none;
-            border-color: #ff5a4d;
-            box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.2);
+            border-color: #668876;
+            box-shadow: 0 0 0 3px rgba(122, 158, 126, 0.2);
         }
 
         button {
@@ -124,22 +131,22 @@
                 padding: 15px;
             }
 
-            .form-wrapper {
+            .name-row {
                 flex-direction: column;
-                width: 100%;
                 gap: 0.8rem;
             }
 
+            .form-wrapper {
+                gap: 0.8rem;
+            }
+
+            input[type="text"],
             input[type="email"] {
-                width: 100%;
-                max-width: none;
-                min-width: 0;
                 padding: 1rem 1.2rem;
                 font-size: 1rem;
             }
 
             button {
-                width: 100%;
                 padding: 1rem 2rem;
                 font-size: 1rem;
             }
@@ -150,6 +157,22 @@
     <div class="subscribe-container">
         <form id="subscribeForm">
             <div class="form-wrapper">
+                <div class="name-row">
+                    <input 
+                        type="text" 
+                        id="firstName" 
+                        name="firstName" 
+                        placeholder="First Name" 
+                        required
+                    >
+                    <input 
+                        type="text" 
+                        id="lastName" 
+                        name="lastName" 
+                        placeholder="Last Name" 
+                        required
+                    >
+                </div>
                 <input 
                     type="email" 
                     id="email" 
@@ -165,6 +188,8 @@
 
     <script>
         const form = document.getElementById('subscribeForm');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
         const emailInput = document.getElementById('email');
         const submitBtn = document.getElementById('submitBtn');
         const messageDiv = document.getElementById('message');
@@ -172,10 +197,12 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
             const email = emailInput.value.trim();
             
-            if (!email) {
-                showMessage('Please enter a valid email address', 'error');
+            if (!email || !firstName || !lastName) {
+                showMessage('Please fill out all fields', 'error');
                 return;
             }
 
@@ -191,6 +218,10 @@
                     },
                     body: JSON.stringify({
                         email: email,
+                        custom_fields: [
+                            { name: 'first_name', value: firstName },
+                            { name: 'last_name', value: lastName }
+                        ],
                         reactivate_existing: false,
                         send_welcome_email: true,
                         utm_source: 'website',
@@ -200,6 +231,8 @@
 
                 if (response.ok) {
                     showMessage("Welcome to the CO! We're so excited that you wanted to build your community and be in the know about all things Denver. Check your inbox for more updates!", 'success');
+                    firstNameInput.value = '';
+                    lastNameInput.value = '';
                     emailInput.value = '';
                 } else {
                     const errorData = await response.json();
