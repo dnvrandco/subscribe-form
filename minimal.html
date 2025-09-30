@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: transparent;
+        }
+
+        body {
+            background: transparent;
+            font-family: 'Anybody', sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .subscribe-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .form-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="email"] {
+            padding: 1.2rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid #ff6f61;
+            border-radius: 8px;
+            background: #f2e7da;
+            color: #333333;
+            font-family: 'Anybody', sans-serif;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        input[type="email"]::placeholder {
+            color: #999999;
+        }
+
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #ff5a4d;
+            box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.2);
+        }
+
+        button {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background-color: #ff6f61;
+            color: #f2e7da;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Anybody', sans-serif;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: #ff5a4d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Anybody', sans-serif;
+            display: none;
+            text-align: center;
+        }
+
+        .message.success {
+            background: transparent;
+            border: none;
+            color: #f2e7da;
+            display: block;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .form-wrapper {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.8rem;
+            }
+
+            input[type="email"] {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+
+            button {
+                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="subscribe-container">
+        <form id="subscribeForm">
+            <div class="form-wrapper">
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Email Address" 
+                    required
+                >
+                <button type="submit" id="submitBtn">JOIN OUR CO.</button>
+            </div>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('subscribeForm');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'SUBSCRIBING...';
+            messageDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('https://api.beehiiv.com/v2/publications/d1c3a035-75ee-419d-b4a1-d5eb8d9cbbf7/subscriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        reactivate_existing: false,
+                        send_welcome_email: true,
+                        utm_source: 'website',
+                        utm_medium: 'organic'
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage("Welcome to the CO! We're so excited that you wanted to build your community and be in the know about all things Denver. Check your inbox for more updates!", 'success');
+                    emailInput.value = '';
+                } else {
+                    const errorData = await response.json();
+                    showMessage(errorData.message || 'Subscription failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again later.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'JOIN OUR CO.';
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+        }
+    </script>
+</body>
+</html>
