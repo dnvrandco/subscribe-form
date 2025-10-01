@@ -22,7 +22,7 @@
             background: transparent;
             color: #f2e7da;
             font-family: 'Anybody', sans-serif;
-            padding: 40px 20px;
+            padding: 20px;
             margin: 0;
         }
 
@@ -128,32 +128,36 @@
         }
 
         @media (max-width: 768px) {
-    body {
-        padding: 20px;
-    }
+            body {
+                padding: 15px;
+            }
 
-    .subtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.2rem;
+                line-height: 1.5;
+            }
 
-    .form-wrapper {
-        flex-direction: column;
-        width: 100%;
-        gap: 1rem;
-    }
+            .form-wrapper {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.8rem;
+            }
 
-    input[type="email"] {
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-    }
+            input[type="email"] {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
 
-    button {
-        width: 100%;
-        padding: 1.2rem 2rem;
-    }
-}
+            button {
+                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -200,6 +204,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': 'Bearer m9gbuxUK0EeiXdncuzwJO9I5mCu6kXl3LaayetVMyrqeYNhK5YSRxplWmjqA4qN2'
                     },
                     body: JSON.stringify({
                         email: email,
@@ -211,7 +216,7 @@
                 });
 
                 if (response.ok) {
-                    showMessage('Successfully subscribed! Check your email to confirm.', 'success');
+                    showMessage("Welcome to the CO! We're so excited that you wanted to build your community and be in the know about all things Denver. Check your inbox for more updates!", 'success');
                     emailInput.value = '';
                 } else {
                     const errorData = await response.json();
